@@ -1,0 +1,212 @@
+@model StudentCourseRegistration.Models.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<!-- Hero / Welcome Banner -->
+<div class="page-header-banner d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+    <div>
+        <div class="badge bg-warning text-dark mb-2 px-3 py-1 rounded-pill fw-semibold">
+            <i class="bi bi-award-fill me-1"></i> Marwadi University Portal
+        </div>
+        <h1>Student Course Registration System</h1>
+        <p>Manage course enrollments, track student registrations, and view academic programs.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-controller="Student" asp-action="Create" class="btn btn-warning text-dark fw-bold px-4 py-2 shadow-sm rounded-pill">
+            <i class="bi bi-person-plus-fill me-1"></i> Register Student
+        </a>
+        <a asp-controller="Student" asp-action="Index" class="btn btn-outline-light fw-semibold px-4 py-2 rounded-pill">
+            <i class="bi bi-table me-1"></i> View Directory
+        </a>
+    </div>
+</div>
+
+<!-- Key Performance & Statistics Cards -->
+<div class="row g-4 mb-4">
+    <!-- Stat 1: Total Students -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card stat-blue">
+            <i class="bi bi-people-fill stat-icon"></i>
+            <div class="stat-title">Registered Students</div>
+            <div class="stat-value">@Model.TotalStudents</div>
+            <div class="small mt-2 opacity-75">
+                <i class="bi bi-arrow-up-circle"></i> Live in-memory count
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat 2: Available Courses -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card stat-purple">
+            <i class="bi bi-book-half stat-icon"></i>
+            <div class="stat-title">Courses Available</div>
+            <div class="stat-value">@Model.TotalCoursesAvailable</div>
+            <div class="small mt-2 opacity-75">
+                <i class="bi bi-check2-circle"></i> Engineering & Tech
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat 3: Active Semesters -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card stat-orange">
+            <i class="bi bi-calendar3 stat-icon"></i>
+            <div class="stat-title">Active Semesters</div>
+            <div class="stat-value">@Model.ActiveSemestersCount</div>
+            <div class="small mt-2 opacity-75">
+                <i class="bi bi-mortarboard"></i> Semesters 1 through 8
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat 4: System Status -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card stat-green">
+            <i class="bi bi-shield-check stat-icon"></i>
+            <div class="stat-title">System Status</div>
+            <div class="stat-value fs-3">Operational</div>
+            <div class="small mt-2 opacity-75">
+                <i class="bi bi-cpu"></i> ASP.NET Core MVC Active
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Dashboard Content Sections -->
+<div class="row g-4">
+    <!-- Recent Registrations Table -->
+    <div class="col-lg-8">
+        <div class="card-modern h-100">
+            <div class="card-header-custom">
+                <div>
+                    <i class="bi bi-clock-history me-2 text-primary"></i>
+                    <span>Recently Registered Students</span>
+                </div>
+                <a asp-controller="Student" asp-action="Index" class="btn btn-sm btn-outline-primary rounded-pill">
+                    View All <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.RecentStudents != null && Model.RecentStudents.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-custom table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Student Name</th>
+                                    <th>Course</th>
+                                    <th>Semester</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var student in Model.RecentStudents)
+                                {
+                                    <tr>
+                                        <td class="fw-bold text-primary">#@student.StudentId</td>
+                                        <td>
+                                            <div class="fw-semibold">@student.StudentName</div>
+                                            <small class="text-muted">@student.Email</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge-course">@student.Course</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge-semester">Sem @student.Semester</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <a asp-controller="Student" asp-action="Details" asp-route-id="@student.StudentId" class="btn btn-sm btn-light text-primary border">
+                                                <i class="bi bi-eye-fill"></i> Details
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="p-4 text-center text-muted">
+                        <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
+                        <p class="mb-2">No students registered yet.</p>
+                        <a asp-controller="Student" asp-action="Create" class="btn btn-sm btn-primary-custom">
+                            Register First Student
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Side: Course Distribution & Architecture Highlights -->
+    <div class="col-lg-4">
+        <!-- Enrollment Distribution -->
+        <div class="card-modern mb-4">
+            <div class="card-header-custom">
+                <div>
+                    <i class="bi bi-pie-chart-fill me-2 text-primary"></i>
+                    <span>Enrollments by Program</span>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (Model.StudentsByCourse != null && Model.StudentsByCourse.Any())
+                {
+                    <div class="d-flex flex-column gap-3">
+                        @foreach (var courseGroup in Model.StudentsByCourse)
+                        {
+                            <div>
+                                <div class="d-flex justify-content-between mb-1 small fw-semibold">
+                                    <span class="text-truncate me-2" style="max-width: 200px;" title="@courseGroup.Key">@courseGroup.Key</span>
+                                    <span class="badge bg-primary rounded-pill">@courseGroup.Value student(s)</span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    @{
+                                        int percent = (int)(((double)courseGroup.Value / Model.TotalStudents) * 100);
+                                    }
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: @percent%" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted small mb-0">No course statistics available.</p>
+                }
+            </div>
+        </div>
+
+        <!-- Viva & Technical Architecture Card -->
+        <div class="card-modern">
+            <div class="card-header-custom">
+                <div>
+                    <i class="bi bi-info-circle-fill me-2 text-primary"></i>
+                    <span>Architecture Highlights</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0 d-flex flex-column gap-2 small">
+                    <li class="d-flex align-items-start gap-2">
+                        <i class="bi bi-check-circle-fill text-success mt-1"></i>
+                        <div><strong>ASP.NET Core MVC:</strong> Strict separation of Model, View, and Controller.</div>
+                    </li>
+                    <li class="d-flex align-items-start gap-2">
+                        <i class="bi bi-check-circle-fill text-success mt-1"></i>
+                        <div><strong>Data Annotations:</strong> [Required], [StringLength], [Range], [EmailAddress].</div>
+                    </li>
+                    <li class="d-flex align-items-start gap-2">
+                        <i class="bi bi-check-circle-fill text-success mt-1"></i>
+                        <div><strong>Model Binding:</strong> Automatic HTTP POST payload to C# object mapping.</div>
+                    </li>
+                    <li class="d-flex align-items-start gap-2">
+                        <i class="bi bi-check-circle-fill text-success mt-1"></i>
+                        <div><strong>ModelState.IsValid:</strong> Server-side integrity check before committing data.</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

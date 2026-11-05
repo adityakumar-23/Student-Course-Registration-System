@@ -1,0 +1,208 @@
+@model IEnumerable<StudentCourseRegistration.Models.Student>
+@{
+    ViewData["Title"] = "Student Directory";
+    var courses = ViewBag.Courses as List<string> ?? new List<string>();
+    string currentSearch = ViewBag.CurrentSearch as string ?? "";
+    string selectedCourse = ViewBag.SelectedCourse as string ?? "";
+}
+
+<!-- Page Header -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1 small">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Dashboard</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Students</li>
+            </ol>
+        </nav>
+        <h2 class="fw-bold text-dark mb-0">Registered Students Directory</h2>
+        <p class="text-muted mb-0">Browse, search, and manage all enrolled university students.</p>
+    </div>
+    <div>
+        <a asp-action="Create" class="btn btn-primary-custom d-inline-flex align-items-center gap-2 shadow-sm">
+            <i class="bi bi-person-plus-fill fs-5"></i>
+            <span>Register New Student</span>
+        </a>
+    </div>
+</div>
+
+<!-- Search and Filter Bar -->
+<div class="card-modern mb-4">
+    <div class="card-body">
+        <form method="get" asp-action="Index" class="row g-3 align-items-end">
+            <!-- Search Input -->
+            <div class="col-md-5">
+                <label class="form-label small text-muted"><i class="bi bi-search me-1"></i> Search by ID, Name or Email</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" name="searchString" value="@currentSearch" class="form-control" placeholder="e.g. Aarav, 101001, or patel@@marwadi.edu.in" />
+                </div>
+            </div>
+
+            <!-- Course Filter -->
+            <div class="col-md-4">
+                <label class="form-label small text-muted"><i class="bi bi-funnel me-1"></i> Filter by Course</label>
+                <select name="selectedCourse" class="form-select">
+                    <option value="">-- All Academic Courses --</option>
+                    @foreach (var course in courses)
+                    {
+                        if (course == selectedCourse)
+                        {
+                            <option value="@course" selected>@course</option>
+                        }
+                        else
+                        {
+                            <option value="@course">@course</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <!-- Filter Buttons -->
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary-custom flex-grow-1">
+                    <i class="bi bi-filter"></i> Apply
+                </button>
+                @if (!string.IsNullOrEmpty(currentSearch) || !string.IsNullOrEmpty(selectedCourse))
+                {
+                    <a asp-action="Index" class="btn btn-outline-secondary" title="Reset Filters">
+                        <i class="bi bi-arrow-counterclockwise"></i> Reset
+                    </a>
+                }
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Student List Table -->
+<div class="card-modern">
+    <div class="card-header-custom">
+        <div>
+            <i class="bi bi-people me-2 text-primary"></i>
+            <span>Student Roster</span>
+            <span class="badge bg-secondary ms-2">@Model.Count() records</span>
+        </div>
+        <div class="small text-muted">
+            Click 'Details' for complete academic profile
+        </div>
+    </div>
+    <div class="card-body p-0">
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-custom table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 110px;">Student ID</th>
+                            <th>Student Information</th>
+                            <th>Course / Program</th>
+                            <th class="text-center" style="width: 120px;">Semester</th>
+                            <th style="width: 140px;">Registered On</th>
+                            <th style="width: 100px;">Status</th>
+                            <th class="text-end" style="width: 160px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="fw-bold text-primary">
+                                    <span class="badge bg-light text-primary border px-2 py-1">
+                                        #@item.StudentId
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark">@item.StudentName</div>
+                                    <div class="small text-muted">
+                                        <i class="bi bi-envelope me-1"></i>@item.Email
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge-course">
+                                        <i class="bi bi-book me-1"></i>@item.Course
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge-semester">
+                                        Semester @item.Semester
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="small text-muted">
+                                        <i class="bi bi-calendar-event me-1"></i>@item.RegistrationDate.ToString("dd MMM yyyy")
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge-status-active">
+                                        <i class="bi bi-check-circle-fill me-1"></i>@item.Status
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-inline-flex gap-1">
+                                        <a asp-action="Details" asp-route-id="@item.StudentId" class="btn btn-sm btn-outline-primary" title="View Full Details">
+                                            <i class="bi bi-eye"></i> Details
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal-@item.StudentId" title="Remove Student">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+
+                                    <!-- Delete Confirmation Modal for each student -->
+                                    <div class="modal fade" id="deleteModal-@item.StudentId" tabindex="-1" aria-labelledby="deleteModalLabel-@item.StudentId" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content border-0 shadow">
+                                                <div class="modal-header bg-danger text-white">
+                                                    <h5 class="modal-title" id="deleteModalLabel-@item.StudentId">
+                                                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirm Deletion
+                                                    </h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body text-start py-4">
+                                                    <p class="mb-2">Are you sure you want to remove the student record for:</p>
+                                                    <div class="p-3 bg-light rounded border">
+                                                        <strong>@item.StudentName</strong> (ID: #@item.StudentId)<br />
+                                                        <small class="text-muted">@item.Course &bull; Semester @item.Semester</small>
+                                                    </div>
+                                                    <p class="text-danger small mt-2 mb-0">This record will be removed from the in-memory store.</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <form asp-action="Delete" asp-route-id="@item.StudentId" method="post" class="d-inline">
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="submit" class="btn btn-danger">
+                                                            <i class="bi bi-trash-fill me-1"></i>Delete Student
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-folder-x display-4 text-muted"></i>
+                <h5 class="mt-3 text-secondary">No matching student records found</h5>
+                <p class="text-muted small">Try adjusting your search criteria or register a new student.</p>
+                <div class="d-flex justify-content-center gap-2 mt-3">
+                    @if (!string.IsNullOrEmpty(currentSearch) || !string.IsNullOrEmpty(selectedCourse))
+                    {
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i>Clear Filters
+                        </a>
+                    }
+                    <a asp-action="Create" class="btn btn-primary-custom">
+                        <i class="bi bi-person-plus-fill me-1"></i>Register New Student
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+

@@ -1,0 +1,132 @@
+@model StudentCourseRegistration.Models.Student
+@{
+    ViewData["Title"] = $"Student Details - {Model.StudentName}";
+    // Extract initials for the avatar badge
+    string initials = "MU";
+    if (!string.IsNullOrWhiteSpace(Model.StudentName))
+    {
+        var parts = Model.StudentName.Trim().Split(' ');
+        if (parts.Length >= 2)
+        {
+            initials = $"{parts[0][0]}{parts[1][0]}".ToUpper();
+        }
+        else if (parts.Length == 1 && parts[0].Length > 0)
+        {
+            initials = parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper();
+        }
+    }
+}
+
+<!-- Breadcrumb -->
+<div class="mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1 small">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Dashboard</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Student" asp-action="Index">Students</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Student #@Model.StudentId</li>
+        </ol>
+    </nav>
+    <h2 class="fw-bold text-dark mb-1">Student Academic Profile</h2>
+    <p class="text-muted">Comprehensive registration details for student #@Model.StudentId.</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-9 col-xl-8">
+        <div class="card-modern">
+            <!-- Header with University Brand Background -->
+            <div class="card-header-custom bg-light">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-person-badge-fill text-primary fs-5"></i>
+                    <span class="fw-bold">Enrolled Student Record</span>
+                </div>
+                <span class="badge-status-active">
+                    <i class="bi bi-check-circle-fill me-1"></i>@Model.Status
+                </span>
+            </div>
+
+            <div class="card-body p-4 p-md-5">
+                <!-- Profile Avatar and Primary Name -->
+                <div class="text-center mb-4">
+                    <div class="details-avatar">
+                        @initials
+                    </div>
+                    <h3 class="fw-bold text-dark mb-1">@Model.StudentName</h3>
+                    <p class="text-muted mb-2">
+                        <i class="bi bi-envelope me-1"></i>@Model.Email
+                    </p>
+                    <div class="d-flex justify-content-center gap-2">
+                        <span class="badge bg-light text-primary border px-3 py-2 fw-semibold">
+                            <i class="bi bi-hash"></i> Student ID: @Model.StudentId
+                        </span>
+                        <span class="badge bg-light text-secondary border px-3 py-2 fw-semibold">
+                            <i class="bi bi-calendar-check me-1"></i> Registered: @Model.RegistrationDate.ToString("MMMM dd, yyyy")
+                        </span>
+                    </div>
+                </div>
+
+                <hr class="my-4 text-muted" />
+
+                <!-- Academic Details Grid -->
+                <div class="row g-4">
+                    <!-- Student ID Box -->
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <div class="details-label"><i class="bi bi-card-heading text-primary me-1"></i> University Roll / Student ID</div>
+                            <div class="details-value mb-0 text-primary">#@Model.StudentId</div>
+                        </div>
+                    </div>
+
+                    <!-- Full Name Box -->
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <div class="details-label"><i class="bi bi-person-fill text-primary me-1"></i> Full Legal Name</div>
+                            <div class="details-value mb-0">@Model.StudentName</div>
+                        </div>
+                    </div>
+
+                    <!-- Email Box -->
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <div class="details-label"><i class="bi bi-envelope-at-fill text-primary me-1"></i> Registered Email</div>
+                            <div class="details-value mb-0 text-truncate" title="@Model.Email">@Model.Email</div>
+                        </div>
+                    </div>
+
+                    <!-- Semester Box -->
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <div class="details-label"><i class="bi bi-layers-fill text-primary me-1"></i> Current Semester</div>
+                            <div class="details-value mb-0">
+                                <span class="badge-semester">Semester @Model.Semester (Year @((Model.Semester + 1) / 2))</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Course / Program Box -->
+                    <div class="col-12">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <div class="details-label"><i class="bi bi-mortarboard-fill text-primary me-1"></i> Registered Program / Course</div>
+                            <div class="details-value mb-0 fs-5 text-primary">
+                                <i class="bi bi-award me-1"></i> @Model.Course
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Footer Buttons -->
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 mt-5 pt-3 border-top">
+                    <a asp-action="Index" class="btn btn-outline-secondary px-3">
+                        <i class="bi bi-arrow-left me-1"></i> Back to Student Directory
+                    </a>
+
+                    <div class="d-flex gap-2">
+                        <a asp-action="Create" class="btn btn-primary-custom px-3">
+                            <i class="bi bi-person-plus me-1"></i> Register Another Student
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

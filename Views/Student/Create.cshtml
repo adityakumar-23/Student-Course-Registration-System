@@ -1,0 +1,158 @@
+@model StudentCourseRegistration.Models.Student
+@{
+    ViewData["Title"] = "Student Course Registration";
+    var courses = ViewBag.Courses as List<string> ?? new List<string>();
+}
+
+<!-- Page Breadcrumb & Header -->
+<div class="mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1 small">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Dashboard</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Student" asp-action="Index">Students</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Registration</li>
+        </ol>
+    </nav>
+    <h2 class="fw-bold text-dark mb-1">New Student Course Registration</h2>
+    <p class="text-muted">Fill in the student details below to register a course at Marwadi University.</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card-modern">
+            <div class="card-header-custom">
+                <div>
+                    <i class="bi bi-pencil-square me-2 text-primary"></i>
+                    <span>Student Registration Form</span>
+                </div>
+                <span class="badge bg-light text-muted border small">* All fields are mandatory</span>
+            </div>
+
+            <div class="card-body p-4">
+                <!-- Registration Form using Tag Helpers & Model Binding -->
+                <form asp-action="Create" method="post" novalidate id="studentRegistrationForm">
+                    @Html.AntiForgeryToken()
+
+                    <!-- Validation Summary for general/model errors (e.g. duplicate ID) -->
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger shadow-sm border-0 mb-4" role="alert">
+                        <i class="bi bi-exclamation-circle-fill me-2"></i><strong>Please correct the following errors:</strong>
+                    </div>
+
+                    <div class="row g-3">
+                        <!-- Student ID -->
+                        <div class="col-md-6">
+                            <label asp-for="StudentId" class="form-label">
+                                <i class="bi bi-hash text-primary me-1"></i>Student ID <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-card-heading"></i></span>
+                                <input asp-for="StudentId" class="form-control" placeholder="e.g. 101006" />
+                            </div>
+                            <span asp-validation-for="StudentId" class="text-danger"></span>
+                            <small class="text-muted">Unique numeric identifier (1000 - 999999).</small>
+                        </div>
+
+                        <!-- Student Name -->
+                        <div class="col-md-6">
+                            <label asp-for="StudentName" class="form-label">
+                                <i class="bi bi-person text-primary me-1"></i>Student Full Name <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                                <input asp-for="StudentName" class="form-control" placeholder="e.g. Rahul Sharma" />
+                            </div>
+                            <span asp-validation-for="StudentName" class="text-danger"></span>
+                            <small class="text-muted">Between 3 and 50 characters.</small>
+                        </div>
+
+                        <!-- Email Address -->
+                        <div class="col-12">
+                            <label asp-for="Email" class="form-label">
+                                <i class="bi bi-envelope text-primary me-1"></i>Email Address <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope-at"></i></span>
+                                <input asp-for="Email" class="form-control" placeholder="e.g. student@@marwadi.edu.in" />
+                            </div>
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                            <small class="text-muted">Official university or personal email for correspondence.</small>
+                        </div>
+
+                        <!-- Course Selection Dropdown -->
+                        <div class="col-md-7">
+                            <label asp-for="Course" class="form-label">
+                                <i class="bi bi-book text-primary me-1"></i>Course / Program <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-mortarboard"></i></span>
+                                <select asp-for="Course" class="form-select">
+                                    <option value="">-- Choose Course / Program --</option>
+                                    @foreach (var course in courses)
+                                    {
+                                        <option value="@course">@course</option>
+                                    }
+                                </select>
+                            </div>
+                            <span asp-validation-for="Course" class="text-danger"></span>
+                            <small class="text-muted">Select an approved university curriculum.</small>
+                        </div>
+
+                        <!-- Semester Selection -->
+                        <div class="col-md-5">
+                            <label asp-for="Semester" class="form-label">
+                                <i class="bi bi-calendar3 text-primary me-1"></i>Semester <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-layers"></i></span>
+                                <select asp-for="Semester" class="form-select">
+                                    <option value="">-- Select Semester --</option>
+                                    @for (int sem = 1; sem <= 8; sem++)
+                                    {
+                                        <option value="@sem">Semester @sem</option>
+                                    }
+                                </select>
+                            </div>
+                            <span asp-validation-for="Semester" class="text-danger"></span>
+                            <small class="text-muted">Allowed range: 1 to 8.</small>
+                        </div>
+                    </div>
+
+                    <hr class="my-4 text-muted" />
+
+                    <!-- Form Buttons -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Back to Student List
+                        </a>
+                        <div class="d-flex gap-2">
+                            <button type="reset" class="btn btn-light border">
+                                <i class="bi bi-eraser me-1"></i> Reset Form
+                            </button>
+                            <button type="submit" class="btn btn-primary-custom px-4 shadow-sm">
+                                <i class="bi bi-check-circle-fill me-1"></i> Complete Registration
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Self-Learning Activity Reference Banner for Viva -->
+        <div class="card border-0 bg-white mt-4 p-3 shadow-sm rounded-3">
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-lightbulb-fill fs-3 text-warning"></i>
+                <div class="small">
+                    <strong>Marwadi University Assignment Note:</strong>
+                    This form demonstrates <strong>Model Binding</strong> (binding form data to the <code>Student</code> model)
+                    and <strong>ModelState.IsValid</strong> evaluation with Data Annotations (<code>[Required]</code>, <code>[StringLength]</code>, <code>[Range]</code>, <code>[EmailAddress]</code>).
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Render client-side validation scripts for real-time validation without round-trips -->
+    <partial name="_ValidationScriptsPartial" />
+}
+
